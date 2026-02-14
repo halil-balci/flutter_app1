@@ -28,6 +28,14 @@
   "@commission": {
     "description": "E-commerce commission input label"
   },
+  "commissionRate": "Rate",
+  "@commissionRate": {
+    "description": "Commission rate label"
+  },
+  "invalidCommissionRate": "Commission rate must be between 0 and 100",
+  "@invalidCommissionRate": {
+    "description": "Commission rate validation error message"
+  },
   "otherExpenses": "Other Expenses",
   "@otherExpenses": {
     "description": "Other expenses input label"

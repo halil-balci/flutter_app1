@@ -140,6 +140,18 @@ abstract class AppLocalizations {
   /// **'Commission'**
   String get commission;
 
+  /// Commission rate label
+  ///
+  /// In en, this message translates to:
+  /// **'Rate'**
+  String get commissionRate;
+
+  /// Commission rate validation error message
+  ///
+  /// In en, this message translates to:
+  /// **'Commission rate must be between 0 and 100'**
+  String get invalidCommissionRate;
+
   /// Other expenses input label
   ///
   /// In en, this message translates to:

@@ -47,8 +47,15 @@ class CalculateProfitUseCase {
       input.shippingVatIncluded,
     );
 
+    // Calculate commission as a percentage of sale price (excluding VAT)
+    final salePriceBase = _calculateBaseAmount(
+      input.salePrice,
+      input.salePriceVat,
+      input.salePriceVatIncluded,
+    );
+    final commissionBase = salePriceBase * (input.commission / 100);
     final commissionCost = _calculateTotalWithVat(
-      input.commission,
+      commissionBase,
       input.commissionVat,
       input.commissionVatIncluded,
     );
@@ -85,7 +92,7 @@ class CalculateProfitUseCase {
         input.shippingVatIncluded,
       ),
       'commissionVat': _calculateVatAmount(
-        input.commission,
+        commissionBase,
         input.commissionVat,
         input.commissionVatIncluded,
       ),

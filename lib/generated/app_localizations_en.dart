@@ -30,6 +30,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commission => 'Commission';
 
   @override
+  String get commissionRate => 'Rate';
+
+  @override
+  String get invalidCommissionRate =>
+      'Commission rate must be between 0 and 100';
+
+  @override
   String get otherExpenses => 'Other Expenses';
 
   @override

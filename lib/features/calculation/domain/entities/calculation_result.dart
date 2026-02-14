@@ -20,6 +20,21 @@ class CalculationResult {
   double get profitMargin =>
       totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
 
+  // Satış KDV'si (gelir KDV)
+  double get salesVat => breakdown['salePriceVat'] ?? 0;
+
+  // Gider KDV'leri toplamı
+  double get expensesVat =>
+      (breakdown['purchasePriceVat'] ?? 0) +
+      (breakdown['shippingVat'] ?? 0) +
+      (breakdown['commissionVat'] ?? 0) +
+      (breakdown['otherExpensesVat'] ?? 0);
+
+  // Net KDV (ödenecek veya iade alınacak KDV)
+  // Pozitif: Devlete ödenecek KDV
+  // Negatif: Devletten iade alınacak KDV
+  double get netVat => salesVat - expensesVat;
+
   CalculationResult copyWith({
     int? id,
     double? netProfit,

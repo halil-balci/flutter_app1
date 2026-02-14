@@ -14,6 +14,9 @@ class InputSectionCard extends StatelessWidget {
   final String vatIncludedLabel;
   final String? Function(String?)? amountValidator;
   final String? Function(String?)? vatValidator;
+  final bool isPercentage;
+  final FocusNode? amountFocusNode;
+  final FocusNode? vatFocusNode;
 
   const InputSectionCard({
     super.key,
@@ -28,6 +31,9 @@ class InputSectionCard extends StatelessWidget {
     required this.vatIncludedLabel,
     this.amountValidator,
     this.vatValidator,
+    this.isPercentage = false,
+    this.amountFocusNode,
+    this.vatFocusNode,
   });
 
   @override
@@ -76,11 +82,17 @@ class InputSectionCard extends StatelessWidget {
                   flex: 3,
                   child: TextFormField(
                     controller: amountController,
+                    focusNode: amountFocusNode,
                     decoration: InputDecoration(
                       labelText: amountLabel,
-                      prefixText: '₺ ',
+                      prefixText: isPercentage ? null : '₺ ',
                       prefixStyle: const TextStyle(
                         color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      suffixText: isPercentage ? ' %' : null,
+                      suffixStyle: const TextStyle(
+                        color: AppTheme.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -93,6 +105,11 @@ class InputSectionCard extends StatelessWidget {
                       ),
                     ],
                     validator: amountValidator,
+                    onTap: () {
+                      if (amountController.text == '0') {
+                        amountController.clear();
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -100,6 +117,7 @@ class InputSectionCard extends StatelessWidget {
                   flex: 2,
                   child: TextFormField(
                     controller: vatController,
+                    focusNode: vatFocusNode,
                     decoration: InputDecoration(
                       labelText: vatLabel,
                       suffixText: '%',
@@ -117,6 +135,11 @@ class InputSectionCard extends StatelessWidget {
                       ),
                     ],
                     validator: vatValidator,
+                    onTap: () {
+                      if (vatController.text == '0') {
+                        vatController.clear();
+                      }
+                    },
                   ),
                 ),
               ],

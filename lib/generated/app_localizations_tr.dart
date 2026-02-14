@@ -30,6 +30,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commission => 'Komisyon';
 
   @override
+  String get commissionRate => 'Oran';
+
+  @override
+  String get invalidCommissionRate =>
+      'Komisyon oranı 0 ile 100 arasında olmalıdır';
+
+  @override
   String get otherExpenses => 'Diğer Masraflar';
 
   @override

@@ -7,6 +7,8 @@
   "purchasePrice": "Alış Fiyatı",
   "shippingCost": "Kargo Ücreti",
   "commission": "Komisyon",
+  "commissionRate": "Oran",
+  "invalidCommissionRate": "Komisyon oranı 0 ile 100 arasında olmalıdır",
   "otherExpenses": "Diğer Masraflar",
   "vatRate": "KDV Oranı (%)",
   "vatIncluded": "KDV Dahil",
