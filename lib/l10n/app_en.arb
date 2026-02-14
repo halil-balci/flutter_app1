@@ -1,0 +1,151 @@
+{
+  "@@locale": "en",
+  "appTitle": "Profit Calculator",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "calculator": "Calculator",
+  "@calculator": {
+    "description": "Calculator tab label"
+  },
+  "history": "History",
+  "@history": {
+    "description": "History tab label"
+  },
+  "salePrice": "Sale Price",
+  "@salePrice": {
+    "description": "Sale price input label"
+  },
+  "purchasePrice": "Purchase Price",
+  "@purchasePrice": {
+    "description": "Purchase price input label"
+  },
+  "shippingCost": "Shipping Cost",
+  "@shippingCost": {
+    "description": "Shipping cost input label"
+  },
+  "commission": "Commission",
+  "@commission": {
+    "description": "E-commerce commission input label"
+  },
+  "otherExpenses": "Other Expenses",
+  "@otherExpenses": {
+    "description": "Other expenses input label"
+  },
+  "vatRate": "VAT Rate (%)",
+  "@vatRate": {
+    "description": "VAT rate input label"
+  },
+  "vatIncluded": "VAT Included",
+  "@vatIncluded": {
+    "description": "VAT included checkbox label"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Amount field label"
+  },
+  "calculate": "Calculate",
+  "@calculate": {
+    "description": "Calculate button label"
+  },
+  "netProfit": "Net Profit",
+  "@netProfit": {
+    "description": "Net profit label"
+  },
+  "totalRevenue": "Total Revenue",
+  "@totalRevenue": {
+    "description": "Total revenue label"
+  },
+  "totalCosts": "Total Costs",
+  "@totalCosts": {
+    "description": "Total costs label"
+  },
+  "breakdown": "Breakdown",
+  "@breakdown": {
+    "description": "Cost breakdown section label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "exportPdf": "Export PDF",
+  "@exportPdf": {
+    "description": "Export to PDF button label"
+  },
+  "exportCsv": "Export CSV",
+  "@exportCsv": {
+    "description": "Export to CSV button label"
+  },
+  "clearHistory": "Clear History",
+  "@clearHistory": {
+    "description": "Clear history button label"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button label"
+  },
+  "noHistory": "No calculation history",
+  "@noHistory": {
+    "description": "Empty history message"
+  },
+  "calculationSaved": "Calculation saved successfully",
+  "@calculationSaved": {
+    "description": "Success message when calculation is saved"
+  },
+  "calculationDeleted": "Calculation deleted",
+  "@calculationDeleted": {
+    "description": "Success message when calculation is deleted"
+  },
+  "historyCleared": "History cleared",
+  "@historyCleared": {
+    "description": "Success message when history is cleared"
+  },
+  "exportSuccess": "Export completed successfully",
+  "@exportSuccess": {
+    "description": "Success message for export"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error message prefix"
+  },
+  "invalidInput": "Please enter valid values",
+  "@invalidInput": {
+    "description": "Invalid input error message"
+  },
+  "requiredField": "This field is required",
+  "@requiredField": {
+    "description": "Required field error message"
+  },
+  "invalidNumber": "Please enter a valid number",
+  "@invalidNumber": {
+    "description": "Invalid number error message"
+  },
+  "invalidVatRate": "VAT rate must be between 0 and 100",
+  "@invalidVatRate": {
+    "description": "Invalid VAT rate error message"
+  },
+  "confirmClearHistory": "Are you sure you want to clear all history?",
+  "@confirmClearHistory": {
+    "description": "Confirmation dialog message for clearing history"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button label"
+  },
+  "profitReport": "Profit Report",
+  "@profitReport": {
+    "description": "PDF report title"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Date label"
+  },
+  "fillAllFields": "Please fill all required fields",
+  "@fillAllFields": {
+    "description": "Message when not all fields are filled"
+  }
+}
