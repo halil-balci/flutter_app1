@@ -20,33 +20,30 @@ class _CalculationScreenState extends State<CalculationScreen>
 
   // Controllers
   final _salePriceController = TextEditingController();
-  final _salePriceVatController = TextEditingController(text: '0');
   final _purchasePriceController = TextEditingController();
-  final _purchasePriceVatController = TextEditingController(text: '0');
   final _shippingCostController = TextEditingController();
-  final _shippingVatController = TextEditingController(text: '0');
   final _commissionController = TextEditingController();
-  final _commissionVatController = TextEditingController(text: '0');
   final _otherExpensesController = TextEditingController();
-  final _otherExpensesVatController = TextEditingController(text: '0');
 
   // Focus Nodes
   final _salePriceFocusNode = FocusNode();
-  final _salePriceVatFocusNode = FocusNode();
   final _purchasePriceFocusNode = FocusNode();
-  final _purchasePriceVatFocusNode = FocusNode();
   final _shippingCostFocusNode = FocusNode();
-  final _shippingVatFocusNode = FocusNode();
   final _commissionFocusNode = FocusNode();
-  final _commissionVatFocusNode = FocusNode();
   final _otherExpensesFocusNode = FocusNode();
-  final _otherExpensesVatFocusNode = FocusNode();
+
+  // VAT values
+  double _salePriceVat = 0;
+  double _purchasePriceVat = 0;
+  double _shippingVat = 20;
+  double _commissionVat = 20;
+  double _otherExpensesVat = 0;
 
   // VAT checkbox states
   bool _salePriceVatIncluded = false;
   bool _purchasePriceVatIncluded = false;
-  bool _shippingVatIncluded = false;
-  bool _commissionVatIncluded = false;
+  bool _shippingVatIncluded = true;
+  bool _commissionVatIncluded = true;
   bool _otherExpensesVatIncluded = false;
 
   late AnimationController _animController;
@@ -69,26 +66,16 @@ class _CalculationScreenState extends State<CalculationScreen>
   void dispose() {
     _animController.dispose();
     _salePriceController.dispose();
-    _salePriceVatController.dispose();
     _purchasePriceController.dispose();
-    _purchasePriceVatController.dispose();
     _shippingCostController.dispose();
-    _shippingVatController.dispose();
     _commissionController.dispose();
-    _commissionVatController.dispose();
     _otherExpensesController.dispose();
-    _otherExpensesVatController.dispose();
 
     _salePriceFocusNode.dispose();
-    _salePriceVatFocusNode.dispose();
     _purchasePriceFocusNode.dispose();
-    _purchasePriceVatFocusNode.dispose();
     _shippingCostFocusNode.dispose();
-    _shippingVatFocusNode.dispose();
     _commissionFocusNode.dispose();
-    _commissionVatFocusNode.dispose();
     _otherExpensesFocusNode.dispose();
-    _otherExpensesVatFocusNode.dispose();
     super.dispose();
   }
 
@@ -98,28 +85,28 @@ class _CalculationScreenState extends State<CalculationScreen>
       final provider = context.read<CalculationProvider>();
 
       provider.updateSalePrice(
-        double.tryParse(_salePriceController.text) ?? 0,
-        double.tryParse(_salePriceVatController.text) ?? 0,
+        _parseAmount(_salePriceController.text),
+        _salePriceVat,
         _salePriceVatIncluded,
       );
       provider.updatePurchasePrice(
-        double.tryParse(_purchasePriceController.text) ?? 0,
-        double.tryParse(_purchasePriceVatController.text) ?? 0,
+        _parseAmount(_purchasePriceController.text),
+        _purchasePriceVat,
         _purchasePriceVatIncluded,
       );
       provider.updateShippingCost(
-        double.tryParse(_shippingCostController.text) ?? 0,
-        double.tryParse(_shippingVatController.text) ?? 0,
+        _parseAmount(_shippingCostController.text),
+        _shippingVat,
         _shippingVatIncluded,
       );
       provider.updateCommission(
-        double.tryParse(_commissionController.text) ?? 0,
-        double.tryParse(_commissionVatController.text) ?? 0,
+        _parsePercentage(_commissionController.text),
+        _commissionVat,
         _commissionVatIncluded,
       );
       provider.updateOtherExpenses(
-        double.tryParse(_otherExpensesController.text) ?? 0,
-        double.tryParse(_otherExpensesVatController.text) ?? 0,
+        _parseAmount(_otherExpensesController.text),
+        _otherExpensesVat,
         _otherExpensesVatIncluded,
       );
 
@@ -128,23 +115,34 @@ class _CalculationScreenState extends State<CalculationScreen>
     }
   }
 
+  double _parseAmount(String text) {
+    return double.tryParse(text.replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+  }
+
+  double _parsePercentage(String text) {
+    // Percentage formatı zaten nokta ile ayrılmış (5.00)
+    return double.tryParse(text) ?? 0;
+  }
+
   void _reset() {
     HapticFeedback.lightImpact();
     setState(() {
       _salePriceController.clear();
-      _salePriceVatController.text = '0';
       _purchasePriceController.clear();
-      _purchasePriceVatController.text = '0';
       _shippingCostController.clear();
-      _shippingVatController.text = '0';
       _commissionController.clear();
-      _commissionVatController.text = '0';
       _otherExpensesController.clear();
-      _otherExpensesVatController.text = '0';
+
+      _salePriceVat = 0;
+      _purchasePriceVat = 0;
+      _shippingVat = 20;
+      _commissionVat = 20;
+      _otherExpensesVat = 0;
+
       _salePriceVatIncluded = false;
       _purchasePriceVatIncluded = false;
-      _shippingVatIncluded = false;
-      _commissionVatIncluded = false;
+      _shippingVatIncluded = true;
+      _commissionVatIncluded = true;
       _otherExpensesVatIncluded = false;
     });
     context.read<CalculationProvider>().reset();
@@ -234,7 +232,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                         title: l10n.salePrice,
                         icon: Icons.sell_rounded,
                         amountController: _salePriceController,
-                        vatController: _salePriceVatController,
+                        initialVat: _salePriceVat,
+                        onVatChanged: (vat) =>
+                            setState(() => _salePriceVat = vat),
                         vatIncluded: _salePriceVatIncluded,
                         onVatIncludedChanged: (v) =>
                             setState(() => _salePriceVatIncluded = v),
@@ -242,20 +242,14 @@ class _CalculationScreenState extends State<CalculationScreen>
                         vatLabel: l10n.vatRate,
                         vatIncludedLabel: l10n.vatIncluded,
                         amountFocusNode: _salePriceFocusNode,
-                        vatFocusNode: _salePriceVatFocusNode,
                         amountValidator: (v) {
-                          if (v != null &&
-                              v.isNotEmpty &&
-                              double.tryParse(v) == null) {
-                            return l10n.invalidNumber;
-                          }
-                          return null;
-                        },
-                        vatValidator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final vat = double.tryParse(v);
-                          if (vat == null || vat < 0 || vat > 100) {
-                            return l10n.invalidVatRate;
+                          if (v != null && v.isNotEmpty) {
+                            final text = v
+                                .replaceAll('.', '')
+                                .replaceAll(',', '.');
+                            if (double.tryParse(text) == null) {
+                              return l10n.invalidNumber;
+                            }
                           }
                           return null;
                         },
@@ -267,7 +261,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                         title: l10n.purchasePrice,
                         icon: Icons.shopping_cart_rounded,
                         amountController: _purchasePriceController,
-                        vatController: _purchasePriceVatController,
+                        initialVat: _purchasePriceVat,
+                        onVatChanged: (vat) =>
+                            setState(() => _purchasePriceVat = vat),
                         vatIncluded: _purchasePriceVatIncluded,
                         onVatIncludedChanged: (v) =>
                             setState(() => _purchasePriceVatIncluded = v),
@@ -275,20 +271,14 @@ class _CalculationScreenState extends State<CalculationScreen>
                         vatLabel: l10n.vatRate,
                         vatIncludedLabel: l10n.vatIncluded,
                         amountFocusNode: _purchasePriceFocusNode,
-                        vatFocusNode: _purchasePriceVatFocusNode,
                         amountValidator: (v) {
-                          if (v != null &&
-                              v.isNotEmpty &&
-                              double.tryParse(v) == null) {
-                            return l10n.invalidNumber;
-                          }
-                          return null;
-                        },
-                        vatValidator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final vat = double.tryParse(v);
-                          if (vat == null || vat < 0 || vat > 100) {
-                            return l10n.invalidVatRate;
+                          if (v != null && v.isNotEmpty) {
+                            final text = v
+                                .replaceAll('.', '')
+                                .replaceAll(',', '.');
+                            if (double.tryParse(text) == null) {
+                              return l10n.invalidNumber;
+                            }
                           }
                           return null;
                         },
@@ -300,7 +290,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                         title: l10n.shippingCost,
                         icon: Icons.local_shipping_rounded,
                         amountController: _shippingCostController,
-                        vatController: _shippingVatController,
+                        initialVat: _shippingVat,
+                        onVatChanged: (vat) =>
+                            setState(() => _shippingVat = vat),
                         vatIncluded: _shippingVatIncluded,
                         onVatIncludedChanged: (v) =>
                             setState(() => _shippingVatIncluded = v),
@@ -308,20 +300,14 @@ class _CalculationScreenState extends State<CalculationScreen>
                         vatLabel: l10n.vatRate,
                         vatIncludedLabel: l10n.vatIncluded,
                         amountFocusNode: _shippingCostFocusNode,
-                        vatFocusNode: _shippingVatFocusNode,
                         amountValidator: (v) {
-                          if (v != null &&
-                              v.isNotEmpty &&
-                              double.tryParse(v) == null) {
-                            return l10n.invalidNumber;
-                          }
-                          return null;
-                        },
-                        vatValidator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final vat = double.tryParse(v);
-                          if (vat == null || vat < 0 || vat > 100) {
-                            return l10n.invalidVatRate;
+                          if (v != null && v.isNotEmpty) {
+                            final text = v
+                                .replaceAll('.', '')
+                                .replaceAll(',', '.');
+                            if (double.tryParse(text) == null) {
+                              return l10n.invalidNumber;
+                            }
                           }
                           return null;
                         },
@@ -333,7 +319,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                         title: l10n.commission,
                         icon: Icons.percent_rounded,
                         amountController: _commissionController,
-                        vatController: _commissionVatController,
+                        initialVat: _commissionVat,
+                        onVatChanged: (vat) =>
+                            setState(() => _commissionVat = vat),
                         vatIncluded: _commissionVatIncluded,
                         onVatIncludedChanged: (v) =>
                             setState(() => _commissionVatIncluded = v),
@@ -342,26 +330,16 @@ class _CalculationScreenState extends State<CalculationScreen>
                         vatIncludedLabel: l10n.vatIncluded,
                         isPercentage: true, // Yüzde olarak göster
                         amountFocusNode: _commissionFocusNode,
-                        vatFocusNode: _commissionVatFocusNode,
                         amountValidator: (v) {
-                          if (v != null &&
-                              v.isNotEmpty &&
-                              double.tryParse(v) == null) {
-                            return l10n.invalidNumber;
-                          }
                           if (v != null && v.isNotEmpty) {
+                            // Percentage formatı zaten nokta ile ayrılmış (5.00)
                             final rate = double.tryParse(v);
-                            if (rate != null && (rate < 0 || rate > 100)) {
+                            if (rate == null) {
+                              return l10n.invalidNumber;
+                            }
+                            if (rate < 0 || rate > 99.99) {
                               return l10n.invalidCommissionRate;
                             }
-                          }
-                          return null;
-                        },
-                        vatValidator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final vat = double.tryParse(v);
-                          if (vat == null || vat < 0 || vat > 100) {
-                            return l10n.invalidVatRate;
                           }
                           return null;
                         },
@@ -373,7 +351,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                         title: l10n.otherExpenses,
                         icon: Icons.receipt_long_rounded,
                         amountController: _otherExpensesController,
-                        vatController: _otherExpensesVatController,
+                        initialVat: _otherExpensesVat,
+                        onVatChanged: (vat) =>
+                            setState(() => _otherExpensesVat = vat),
                         vatIncluded: _otherExpensesVatIncluded,
                         onVatIncludedChanged: (v) =>
                             setState(() => _otherExpensesVatIncluded = v),
@@ -381,20 +361,14 @@ class _CalculationScreenState extends State<CalculationScreen>
                         vatLabel: l10n.vatRate,
                         vatIncludedLabel: l10n.vatIncluded,
                         amountFocusNode: _otherExpensesFocusNode,
-                        vatFocusNode: _otherExpensesVatFocusNode,
                         amountValidator: (v) {
-                          if (v != null &&
-                              v.isNotEmpty &&
-                              double.tryParse(v) == null) {
-                            return l10n.invalidNumber;
-                          }
-                          return null;
-                        },
-                        vatValidator: (v) {
-                          if (v == null || v.isEmpty) return null;
-                          final vat = double.tryParse(v);
-                          if (vat == null || vat < 0 || vat > 100) {
-                            return l10n.invalidVatRate;
+                          if (v != null && v.isNotEmpty) {
+                            final text = v
+                                .replaceAll('.', '')
+                                .replaceAll(',', '.');
+                            if (double.tryParse(text) == null) {
+                              return l10n.invalidNumber;
+                            }
                           }
                           return null;
                         },

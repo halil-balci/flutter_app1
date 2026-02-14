@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../generated/app_localizations.dart';
 import '../../domain/entities/calculation_result.dart';
 
 class ProfitSummaryCard extends StatelessWidget {
@@ -19,6 +20,7 @@ class ProfitSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isProfitable = result.isProfitable;
 
     return Container(
@@ -41,45 +43,83 @@ class ProfitSummaryCard extends StatelessWidget {
               ),
               child: Column(
                 children: [
+                  Text(
+                    l10n.yourRevenueFromSale,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         isProfitable
-                            ? Icons.trending_up_rounded
+                            ? Icons.account_balance_wallet_rounded
                             : Icons.trending_down_rounded,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        size: 20,
+                        color: Colors.white,
+                        size: 28,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isProfitable ? 'KAR' : 'ZARAR',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white.withValues(alpha: 0.9),
-                          letterSpacing: 1.5,
+                      const SizedBox(width: 12),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '${!isProfitable ? '-' : ''}${CurrencyFormatter.formatWithSymbol(result.netProfit.abs())}',
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -1,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    CurrencyFormatter.formatWithSymbol(result.netProfit.abs()),
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -1,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Kar Marjı: %${result.profitMargin.toStringAsFixed(1)}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white.withValues(alpha: 0.85),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isProfitable
+                              ? Icons.trending_up_rounded
+                              : Icons.trending_down_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isProfitable ? l10n.profit : l10n.loss,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${result.profitMargin.toStringAsFixed(1)}%',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -92,119 +132,245 @@ class ProfitSummaryCard extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  _buildSummaryRow(
-                    icon: Icons.arrow_upward_rounded,
-                    iconColor: AppTheme.successColor,
-                    label: 'Toplam Gelir',
-                    value: CurrencyFormatter.formatWithSymbol(
-                      result.totalRevenue,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildSummaryRow(
-                    icon: Icons.arrow_downward_rounded,
-                    iconColor: AppTheme.dangerColor,
-                    label: 'Toplam Maliyet',
-                    value: CurrencyFormatter.formatWithSymbol(
-                      result.totalCosts,
-                    ),
-                  ),
-
-                  // KDV Bilgileri
+                  // Devlete Ödenecek KDV - BELİRGİN GÖSTER
                   if (result.salesVat > 0 || result.expensesVat > 0) ...[
-                    const SizedBox(height: 16),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.05),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        gradient: result.netVat >= 0
+                            ? LinearGradient(
+                                colors: [
+                                  const Color(
+                                    0xFFFF6B6B,
+                                  ).withValues(alpha: 0.1),
+                                  const Color(
+                                    0xFFEE5A6F,
+                                  ).withValues(alpha: 0.1),
+                                ],
+                              )
+                            : LinearGradient(
+                                colors: [
+                                  const Color(
+                                    0xFF10B981,
+                                  ).withValues(alpha: 0.1),
+                                  const Color(
+                                    0xFF059669,
+                                  ).withValues(alpha: 0.1),
+                                ],
+                              ),
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                         border: Border.all(
-                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
+                          color: result.netVat >= 0
+                              ? const Color(0xFFFF6B6B).withValues(alpha: 0.3)
+                              : const Color(0xFF10B981).withValues(alpha: 0.3),
+                          width: 1.5,
                         ),
                       ),
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Satış KDV',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppTheme.textSecondary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                CurrencyFormatter.formatWithSymbol(
-                                  result.salesVat,
-                                ),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.successColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Gider KDV',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppTheme.textSecondary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                CurrencyFormatter.formatWithSymbol(
-                                  result.expensesVat,
-                                ),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppTheme.dangerColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          const Divider(height: 1),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                result.netVat >= 0
-                                    ? 'Ödenecek KDV'
-                                    : 'İade KDV',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppTheme.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                CurrencyFormatter.formatWithSymbol(
-                                  result.netVat.abs(),
-                                ),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
                                   color: result.netVat >= 0
-                                      ? AppTheme.dangerColor
-                                      : AppTheme.successColor,
+                                      ? const Color(
+                                          0xFFFF6B6B,
+                                        ).withValues(alpha: 0.15)
+                                      : const Color(
+                                          0xFF10B981,
+                                        ).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  result.netVat >= 0
+                                      ? Icons.account_balance_rounded
+                                      : Icons.monetization_on_rounded,
+                                  color: result.netVat >= 0
+                                      ? const Color(0xFFFF6B6B)
+                                      : const Color(0xFF10B981),
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      result.netVat >= 0
+                                          ? l10n.vatPayableToGovernment
+                                          : l10n.vatRefundFromGovernment,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.textSecondary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        CurrencyFormatter.formatWithSymbol(
+                                          result.netVat.abs(),
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w800,
+                                          color: result.netVat >= 0
+                                              ? const Color(0xFFFF6B6B)
+                                              : const Color(0xFF10B981),
+                                          letterSpacing: -0.5,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.surfaceColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 4,
+                                          decoration: const BoxDecoration(
+                                            color: AppTheme.successColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          l10n.salesVat,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppTheme.textSecondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          CurrencyFormatter.formatWithSymbol(
+                                            result.salesVat,
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.textPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 4,
+                                          height: 4,
+                                          decoration: const BoxDecoration(
+                                            color: AppTheme.dangerColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          l10n.expensesVat,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppTheme.textSecondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Flexible(
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          '- ${CurrencyFormatter.formatWithSymbol(result.expensesVat)}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppTheme.textPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
+
+                  // Gelir ve Masraf Detayları
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceColor,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.calculationDetails,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textSecondary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryRow(
+                          icon: Icons.arrow_upward_rounded,
+                          iconColor: AppTheme.successColor,
+                          label: l10n.totalIncome,
+                          value: CurrencyFormatter.formatWithSymbol(
+                            result.totalRevenue,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildSummaryRow(
+                          icon: Icons.arrow_downward_rounded,
+                          iconColor: AppTheme.dangerColor,
+                          label: l10n.totalExpenses,
+                          value: CurrencyFormatter.formatWithSymbol(
+                            result.totalCosts,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 20),
 
@@ -214,7 +380,7 @@ class ProfitSummaryCard extends StatelessWidget {
                       Expanded(
                         child: _buildActionButton(
                           icon: Icons.save_rounded,
-                          label: 'Kaydet',
+                          label: l10n.saveButton,
                           onTap: isLoading ? null : onSave,
                           isPrimary: true,
                         ),
@@ -223,7 +389,7 @@ class ProfitSummaryCard extends StatelessWidget {
                       Expanded(
                         child: _buildActionButton(
                           icon: Icons.picture_as_pdf_rounded,
-                          label: 'PDF',
+                          label: l10n.pdfButton,
                           onTap: isLoading ? null : onExport,
                           isPrimary: false,
                         ),

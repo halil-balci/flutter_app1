@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// Commission rate validation error message
   ///
   /// In en, this message translates to:
-  /// **'Commission rate must be between 0 and 100'**
+  /// **'Commission rate must be between 0 and 99.99'**
   String get invalidCommissionRate;
 
   /// Other expenses input label
@@ -331,6 +331,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please fill all required fields'**
   String get fillAllFields;
+
+  /// Revenue earned from sale label
+  ///
+  /// In en, this message translates to:
+  /// **'Your Revenue from Sale'**
+  String get yourRevenueFromSale;
+
+  /// Profit label
+  ///
+  /// In en, this message translates to:
+  /// **'PROFIT'**
+  String get profit;
+
+  /// Loss label
+  ///
+  /// In en, this message translates to:
+  /// **'LOSS'**
+  String get loss;
+
+  /// VAT amount to be paid to government
+  ///
+  /// In en, this message translates to:
+  /// **'VAT Payable to Government'**
+  String get vatPayableToGovernment;
+
+  /// VAT amount to be refunded from government
+  ///
+  /// In en, this message translates to:
+  /// **'VAT Refund from Government'**
+  String get vatRefundFromGovernment;
+
+  /// Sales VAT amount
+  ///
+  /// In en, this message translates to:
+  /// **'Sales VAT'**
+  String get salesVat;
+
+  /// Expenses VAT amount
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses VAT'**
+  String get expensesVat;
+
+  /// Calculation details section title
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation Details'**
+  String get calculationDetails;
+
+  /// Total income label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Income'**
+  String get totalIncome;
+
+  /// Total expenses label
+  ///
+  /// In en, this message translates to:
+  /// **'Total Expenses'**
+  String get totalExpenses;
+
+  /// Item details section title
+  ///
+  /// In en, this message translates to:
+  /// **'Item Details'**
+  String get itemDetails;
+
+  /// Profit margin label
+  ///
+  /// In en, this message translates to:
+  /// **'Profit Margin'**
+  String get profitMargin;
+
+  /// Save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButton;
+
+  /// PDF export button text
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get pdfButton;
+
+  /// VAT abbreviation
+  ///
+  /// In en, this message translates to:
+  /// **'VAT'**
+  String get vat;
 }
 
 class _AppLocalizationsDelegate

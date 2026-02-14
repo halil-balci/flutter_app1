@@ -32,7 +32,7 @@
   "@commissionRate": {
     "description": "Commission rate label"
   },
-  "invalidCommissionRate": "Commission rate must be between 0 and 100",
+  "invalidCommissionRate": "Commission rate must be between 0 and 99.99",
   "@invalidCommissionRate": {
     "description": "Commission rate validation error message"
   },
@@ -155,5 +155,65 @@
   "fillAllFields": "Please fill all required fields",
   "@fillAllFields": {
     "description": "Message when not all fields are filled"
+  },
+  "yourRevenueFromSale": "Your Revenue from Sale",
+  "@yourRevenueFromSale": {
+    "description": "Revenue earned from sale label"
+  },
+  "profit": "PROFIT",
+  "@profit": {
+    "description": "Profit label"
+  },
+  "loss": "LOSS",
+  "@loss": {
+    "description": "Loss label"
+  },
+  "vatPayableToGovernment": "VAT Payable to Government",
+  "@vatPayableToGovernment": {
+    "description": "VAT amount to be paid to government"
+  },
+  "vatRefundFromGovernment": "VAT Refund from Government",
+  "@vatRefundFromGovernment": {
+    "description": "VAT amount to be refunded from government"
+  },
+  "salesVat": "Sales VAT",
+  "@salesVat": {
+    "description": "Sales VAT amount"
+  },
+  "expensesVat": "Expenses VAT",
+  "@expensesVat": {
+    "description": "Expenses VAT amount"
+  },
+  "calculationDetails": "Calculation Details",
+  "@calculationDetails": {
+    "description": "Calculation details section title"
+  },
+  "totalIncome": "Total Income",
+  "@totalIncome": {
+    "description": "Total income label"
+  },
+  "totalExpenses": "Total Expenses",
+  "@totalExpenses": {
+    "description": "Total expenses label"
+  },
+  "itemDetails": "Item Details",
+  "@itemDetails": {
+    "description": "Item details section title"
+  },
+  "profitMargin": "Profit Margin",
+  "@profitMargin": {
+    "description": "Profit margin label"
+  },
+  "saveButton": "Save",
+  "@saveButton": {
+    "description": "Save button text"
+  },
+  "pdfButton": "PDF",
+  "@pdfButton": {
+    "description": "PDF export button text"
+  },
+  "vat": "VAT",
+  "@vat": {
+    "description": "VAT abbreviation"
   }
 }

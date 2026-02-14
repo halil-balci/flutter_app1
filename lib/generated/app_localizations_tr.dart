@@ -34,7 +34,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invalidCommissionRate =>
-      'Komisyon oranı 0 ile 100 arasında olmalıdır';
+      'Komisyon oranı 0 ile 99.99 arasında olmalıdır';
 
   @override
   String get otherExpenses => 'Diğer Masraflar';
@@ -126,4 +126,49 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get fillAllFields => 'Lütfen tüm gerekli alanları doldurun';
+
+  @override
+  String get yourRevenueFromSale => 'Satıştan Elde Ettiğiniz Gelir';
+
+  @override
+  String get profit => 'KAR';
+
+  @override
+  String get loss => 'ZARAR';
+
+  @override
+  String get vatPayableToGovernment => 'Devlete Ödenecek KDV';
+
+  @override
+  String get vatRefundFromGovernment => 'Devletten İade Alınacak KDV';
+
+  @override
+  String get salesVat => 'Satış KDV';
+
+  @override
+  String get expensesVat => 'Gider KDV';
+
+  @override
+  String get calculationDetails => 'Hesaplama Detayları';
+
+  @override
+  String get totalIncome => 'Toplam Gelir';
+
+  @override
+  String get totalExpenses => 'Toplam Masraf';
+
+  @override
+  String get itemDetails => 'Kalem Detayları';
+
+  @override
+  String get profitMargin => 'Kar Marjı';
+
+  @override
+  String get saveButton => 'Kaydet';
+
+  @override
+  String get pdfButton => 'PDF';
+
+  @override
+  String get vat => 'KDV';
 }
