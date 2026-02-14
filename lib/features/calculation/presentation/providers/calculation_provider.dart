@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import '../../domain/entities/calculation_input.dart';
 import '../../domain/entities/calculation_result.dart';
 import '../../domain/usecases/calculate_profit.dart';
@@ -215,12 +216,24 @@ class CalculationProvider extends ChangeNotifier {
   }
 
   // Share
-  Future<void> shareFile(String filePath, {String? subject}) async {
+  Future<bool> shareFile(
+    String filePath, {
+    String? subject,
+    Rect? sharePositionOrigin,
+  }) async {
     try {
-      await _exportService.shareFile(filePath, subject: subject);
+      final isShared = await _exportService.shareFile(
+        filePath,
+        subject: subject,
+        sharePositionOrigin: sharePositionOrigin,
+      );
+      _errorMessage = null;
+      notifyListeners();
+      return isShared;
     } catch (e) {
       _errorMessage = e.toString();
       notifyListeners();
+      return false;
     }
   }
 

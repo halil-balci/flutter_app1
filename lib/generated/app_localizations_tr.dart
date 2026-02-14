@@ -140,7 +140,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get vatPayableToGovernment => 'Devlete Ödenecek KDV';
 
   @override
-  String get vatRefundFromGovernment => 'Devletten İade Alınacak KDV';
+  String get vatRefundFromGovernment =>
+      'Devreden KDV, Önümüzdeki dönemden düşülecek KDV';
 
   @override
   String get salesVat => 'Satış KDV';

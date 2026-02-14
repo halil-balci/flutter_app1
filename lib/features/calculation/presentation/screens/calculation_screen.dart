@@ -49,6 +49,20 @@ class _CalculationScreenState extends State<CalculationScreen>
   late AnimationController _animController;
   late Animation<double> _fadeAnim;
 
+  Rect _shareOriginFor(BuildContext context) {
+    final renderObject = context.findRenderObject();
+    if (renderObject is RenderBox && renderObject.hasSize) {
+      final size = renderObject.size;
+      if (size.width > 0 && size.height > 0) {
+        final origin = renderObject.localToGlobal(Offset.zero);
+        return origin & size;
+      }
+    }
+
+    final mediaSize = MediaQuery.sizeOf(context);
+    return Rect.fromLTWH(0, 0, mediaSize.width, mediaSize.height);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -445,6 +459,9 @@ class _CalculationScreenState extends State<CalculationScreen>
                                   await provider.shareFile(
                                     path,
                                     subject: l10n.profitReport,
+                                    sharePositionOrigin: _shareOriginFor(
+                                      context,
+                                    ),
                                   );
                                 }
                               },

@@ -15,6 +15,20 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+  Rect _shareOriginFor(BuildContext context) {
+    final renderObject = context.findRenderObject();
+    if (renderObject is RenderBox && renderObject.hasSize) {
+      final size = renderObject.size;
+      if (size.width > 0 && size.height > 0) {
+        final origin = renderObject.localToGlobal(Offset.zero);
+        return origin & size;
+      }
+    }
+
+    final mediaSize = MediaQuery.sizeOf(context);
+    return Rect.fromLTWH(0, 0, mediaSize.width, mediaSize.height);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -97,14 +111,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     if (value == 'export_csv') {
                       final path = await provider.exportHistoryToCsv();
                       if (path != null && context.mounted) {
-                        await provider.shareFile(
+                        await Future<void>.delayed(
+                          const Duration(milliseconds: 150),
+                        );
+                        final isShared = await provider.shareFile(
                           path,
                           subject: l10n.profitReport,
+                          sharePositionOrigin: _shareOriginFor(context),
                         );
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.exportSuccess)),
-                          );
+                          if (isShared) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.exportSuccess)),
+                            );
+                          } else {
+                            final errorText =
+                                provider.errorMessage ?? l10n.error;
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(errorText)));
+                          }
                         }
                       }
                     } else if (value == 'clear_all') {
@@ -210,6 +236,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               await provider.shareFile(
                                 path,
                                 subject: l10n.profitReport,
+                                sharePositionOrigin: _shareOriginFor(context),
                               );
                             }
                           },
@@ -244,6 +271,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           await provider.shareFile(
                             path,
                             subject: l10n.profitReport,
+                            sharePositionOrigin: _shareOriginFor(context),
                           );
                         }
                       },

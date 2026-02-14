@@ -43,7 +43,7 @@
   "profit": "KAR",
   "loss": "ZARAR",
   "vatPayableToGovernment": "Devlete Ödenecek KDV",
-  "vatRefundFromGovernment": "Devletten İade Alınacak KDV",
+  "vatRefundFromGovernment": "Devreden KDV, Önümüzdeki dönemden düşülecek KDV",
   "salesVat": "Satış KDV",
   "expensesVat": "Gider KDV",
   "calculationDetails": "Hesaplama Detayları",

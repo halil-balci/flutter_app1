@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:csv/csv.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -9,7 +10,12 @@ import '../../domain/entities/calculation_result.dart';
 
 class ExportService {
   final DateFormat _dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-  final NumberFormat _currencyFormat = NumberFormat('#,##0.00');
+  final NumberFormat _currencyFormat = NumberFormat('#,##0.00', 'tr_TR');
+  static const String _currencyCode = 'TRY';
+
+  String _formatCurrencyWithCode(double value) {
+    return '${_currencyFormat.format(value)} $_currencyCode';
+  }
 
   Future<String> exportToCsv(List<CalculationResult> results) async {
     if (results.isEmpty) throw Exception('No data to export');
@@ -30,14 +36,14 @@ class ExportService {
     for (final result in results) {
       rows.add([
         _dateFormat.format(result.timestamp),
-        _currencyFormat.format(result.netProfit),
-        _currencyFormat.format(result.totalRevenue),
-        _currencyFormat.format(result.totalCosts),
-        _currencyFormat.format(result.breakdown['salePrice'] ?? 0),
-        _currencyFormat.format(result.breakdown['purchasePrice'] ?? 0),
-        _currencyFormat.format(result.breakdown['shippingCost'] ?? 0),
-        _currencyFormat.format(result.breakdown['commission'] ?? 0),
-        _currencyFormat.format(result.breakdown['otherExpenses'] ?? 0),
+        _formatCurrencyWithCode(result.netProfit),
+        _formatCurrencyWithCode(result.totalRevenue),
+        _formatCurrencyWithCode(result.totalCosts),
+        _formatCurrencyWithCode(result.breakdown['salePrice'] ?? 0),
+        _formatCurrencyWithCode(result.breakdown['purchasePrice'] ?? 0),
+        _formatCurrencyWithCode(result.breakdown['shippingCost'] ?? 0),
+        _formatCurrencyWithCode(result.breakdown['commission'] ?? 0),
+        _formatCurrencyWithCode(result.breakdown['otherExpenses'] ?? 0),
       ]);
     }
 
@@ -92,7 +98,7 @@ class ExportService {
                     ),
                     pw.SizedBox(height: 5),
                     pw.Text(
-                      '${_currencyFormat.format(result.netProfit)} TL',
+                      _formatCurrencyWithCode(result.netProfit),
                       style: pw.TextStyle(
                         fontSize: 20,
                         fontWeight: pw.FontWeight.bold,
@@ -114,14 +120,8 @@ class ExportService {
               ),
               pw.SizedBox(height: 10),
               _buildTable([
-                [
-                  'Total Revenue',
-                  '${_currencyFormat.format(result.totalRevenue)} TL',
-                ],
-                [
-                  'Total Costs',
-                  '${_currencyFormat.format(result.totalCosts)} TL',
-                ],
+                ['Total Revenue', _formatCurrencyWithCode(result.totalRevenue)],
+                ['Total Costs', _formatCurrencyWithCode(result.totalCosts)],
                 [
                   'Profit Margin',
                   '${_currencyFormat.format(result.profitMargin)}%',
@@ -139,23 +139,29 @@ class ExportService {
               _buildTable([
                 [
                   'Sale Price',
-                  '${_currencyFormat.format(result.breakdown['salePrice'] ?? 0)} TL',
+                  _formatCurrencyWithCode(result.breakdown['salePrice'] ?? 0),
                 ],
                 [
                   'Purchase Price',
-                  '${_currencyFormat.format(result.breakdown['purchasePrice'] ?? 0)} TL',
+                  _formatCurrencyWithCode(
+                    result.breakdown['purchasePrice'] ?? 0,
+                  ),
                 ],
                 [
                   'Shipping Cost',
-                  '${_currencyFormat.format(result.breakdown['shippingCost'] ?? 0)} TL',
+                  _formatCurrencyWithCode(
+                    result.breakdown['shippingCost'] ?? 0,
+                  ),
                 ],
                 [
                   'Commission',
-                  '${_currencyFormat.format(result.breakdown['commission'] ?? 0)} TL',
+                  _formatCurrencyWithCode(result.breakdown['commission'] ?? 0),
                 ],
                 [
                   'Other Expenses',
-                  '${_currencyFormat.format(result.breakdown['otherExpenses'] ?? 0)} TL',
+                  _formatCurrencyWithCode(
+                    result.breakdown['otherExpenses'] ?? 0,
+                  ),
                 ],
               ]),
             ],
@@ -191,10 +197,26 @@ class ExportService {
     );
   }
 
-  Future<void> shareFile(String filePath, {String? subject}) async {
-    final file = XFile(filePath);
-    await Share.shareXFiles([
-      file,
-    ], subject: subject ?? 'Profit Calculation Report');
+  Future<bool> shareFile(
+    String filePath, {
+    String? subject,
+    Rect? sharePositionOrigin,
+  }) async {
+    final file = File(filePath);
+    if (!await file.exists()) {
+      throw Exception('File not found: $filePath');
+    }
+
+    final result = await Share.shareXFiles(
+      [XFile(filePath)],
+      subject: subject ?? 'Profit Calculation Report',
+      sharePositionOrigin: sharePositionOrigin,
+    );
+
+    if (result.status == ShareResultStatus.unavailable) {
+      throw Exception(result.raw);
+    }
+
+    return result.status != ShareResultStatus.dismissed;
   }
 }
