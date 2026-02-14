@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/app_localizations.dart';
-import 'providers/calculation_provider.dart';
-import 'screens/calculation_screen.dart';
-import 'screens/history_screen.dart';
+import 'core/theme/app_theme.dart';
+import 'features/calculation/data/datasources/calculation_local_datasource.dart';
+import 'features/calculation/data/repositories/calculation_repository_impl.dart';
+import 'features/calculation/data/services/export_service.dart';
+import 'features/calculation/domain/usecases/calculate_profit.dart';
+import 'features/calculation/domain/usecases/manage_history.dart';
+import 'features/calculation/presentation/providers/calculation_provider.dart';
+import 'features/calculation/presentation/screens/calculation_screen.dart';
+import 'features/calculation/presentation/screens/history_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ),
+  );
   runApp(const MainApp());
 }
 
@@ -15,26 +29,31 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dependency Injection
+    final localDataSource = CalculationLocalDataSource.instance;
+    final repository = CalculationRepositoryImpl(
+      localDataSource: localDataSource,
+    );
+    final calculateProfit = CalculateProfitUseCase();
+    final saveCalculation = SaveCalculationUseCase(repository);
+    final getHistory = GetHistoryUseCase(repository);
+    final deleteCalculation = DeleteCalculationUseCase(repository);
+    final clearHistory = ClearHistoryUseCase(repository);
+    final exportService = ExportService();
+
     return ChangeNotifierProvider(
-      create: (_) => CalculationProvider(),
+      create: (_) => CalculationProvider(
+        calculateProfit: calculateProfit,
+        saveCalculation: saveCalculation,
+        getHistory: getHistory,
+        deleteCalculation: deleteCalculation,
+        clearHistory: clearHistory,
+        exportService: exportService,
+      ),
       child: MaterialApp(
         title: 'Profit Calculator',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.teal,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(centerTitle: true, elevation: 2),
-          cardTheme: const CardThemeData(elevation: 2),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ),
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
         localizationsDelegates: [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -66,25 +85,36 @@ class _MainNavigatorState extends State<MainNavigator> {
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.calculate_outlined),
-            selectedIcon: const Icon(Icons.calculate),
-            label: l10n.calculator,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.history_outlined),
-            selectedIcon: const Icon(Icons.history),
-            label: l10n.history,
-          ),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (index) {
+            HapticFeedback.selectionClick();
+            setState(() => _currentIndex = index);
+          },
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.calculate_outlined),
+              selectedIcon: const Icon(Icons.calculate_rounded),
+              label: l10n.calculator,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.history_outlined),
+              selectedIcon: const Icon(Icons.history_rounded),
+              label: l10n.history,
+            ),
+          ],
+        ),
       ),
     );
   }

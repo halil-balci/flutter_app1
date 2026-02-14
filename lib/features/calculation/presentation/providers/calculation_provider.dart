@@ -1,33 +1,33 @@
 import 'package:flutter/foundation.dart';
-import '../models/calculation_input.dart';
-import '../models/calculation_result.dart';
-import '../services/profit_calculator.dart';
-import '../services/database_service.dart';
-import '../services/export_service.dart';
+import '../../domain/entities/calculation_input.dart';
+import '../../domain/entities/calculation_result.dart';
+import '../../domain/usecases/calculate_profit.dart';
+import '../../domain/usecases/manage_history.dart';
+import '../../data/services/export_service.dart';
 
 class CalculationProvider extends ChangeNotifier {
-  final ProfitCalculator _calculator = ProfitCalculator();
-  final DatabaseService _database = DatabaseService.instance;
-  final ExportService _exportService = ExportService();
+  final CalculateProfitUseCase _calculateProfit;
+  final SaveCalculationUseCase _saveCalculation;
+  final GetHistoryUseCase _getHistory;
+  final DeleteCalculationUseCase _deleteCalculation;
+  final ClearHistoryUseCase _clearHistory;
+  final ExportService _exportService;
 
-  CalculationInput _currentInput = CalculationInput(
-    salePrice: 0,
-    salePriceVat: 0,
-    salePriceVatIncluded: false,
-    purchasePrice: 0,
-    purchasePriceVat: 0,
-    purchasePriceVatIncluded: false,
-    shippingCost: 0,
-    shippingVat: 0,
-    shippingVatIncluded: false,
-    commission: 0,
-    commissionVat: 0,
-    commissionVatIncluded: false,
-    otherExpenses: 0,
-    otherExpensesVat: 0,
-    otherExpensesVatIncluded: false,
-  );
+  CalculationProvider({
+    required CalculateProfitUseCase calculateProfit,
+    required SaveCalculationUseCase saveCalculation,
+    required GetHistoryUseCase getHistory,
+    required DeleteCalculationUseCase deleteCalculation,
+    required ClearHistoryUseCase clearHistory,
+    required ExportService exportService,
+  }) : _calculateProfit = calculateProfit,
+       _saveCalculation = saveCalculation,
+       _getHistory = getHistory,
+       _deleteCalculation = deleteCalculation,
+       _clearHistory = clearHistory,
+       _exportService = exportService;
 
+  CalculationInput _currentInput = CalculationInput.empty;
   CalculationResult? _currentResult;
   List<CalculationResult> _history = [];
   bool _isLoading = false;
@@ -41,7 +41,7 @@ class CalculationProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasResult => _currentResult != null;
 
-  // Update input fields
+  // Update input
   void updateInput(CalculationInput input) {
     _currentInput = input;
     notifyListeners();
@@ -92,11 +92,11 @@ class CalculationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Calculate profit
+  // Calculate
   void calculate() {
     try {
       _errorMessage = null;
-      _currentResult = _calculator.calculate(_currentInput);
+      _currentResult = _calculateProfit(_currentInput);
       notifyListeners();
     } catch (e) {
       _errorMessage = e.toString();
@@ -105,25 +105,19 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Save calculation to database
+  // Save
   Future<void> saveCalculation() async {
     if (_currentResult == null) {
       _errorMessage = 'No calculation to save';
       notifyListeners();
       return;
     }
-
     try {
       _isLoading = true;
       notifyListeners();
-
-      final id = await _database.saveCalculation(
-        _currentResult!,
-        _currentInput,
-      );
+      final id = await _saveCalculation(_currentResult!, _currentInput);
       _currentResult = _currentResult!.copyWith(id: id);
       await loadHistory();
-
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
@@ -134,14 +128,12 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Load calculation history
+  // Load history
   Future<void> loadHistory() async {
     try {
       _isLoading = true;
       notifyListeners();
-
-      _history = await _database.getHistory();
-
+      _history = await _getHistory();
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
@@ -152,15 +144,13 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Delete a calculation
-  Future<void> deleteCalculation(int id) async {
+  // Delete
+  Future<void> deleteCalculationById(int id) async {
     try {
       _isLoading = true;
       notifyListeners();
-
-      await _database.deleteCalculation(id);
+      await _deleteCalculation(id);
       await loadHistory();
-
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
@@ -171,15 +161,13 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Clear all history
-  Future<void> clearHistory() async {
+  // Clear history
+  Future<void> clearAllHistory() async {
     try {
       _isLoading = true;
       notifyListeners();
-
-      await _database.clearHistory();
+      await _clearHistory();
       _history = [];
-
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
@@ -190,18 +178,15 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Export single calculation to PDF
+  // Export PDF
   Future<String?> exportToPdf(CalculationResult result, {String? title}) async {
     try {
       _isLoading = true;
       notifyListeners();
-
       final path = await _exportService.exportToPdf(result, title: title);
-
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
-
       return path;
     } catch (e) {
       _isLoading = false;
@@ -211,18 +196,15 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Export history to CSV
+  // Export CSV
   Future<String?> exportHistoryToCsv() async {
     try {
       _isLoading = true;
       notifyListeners();
-
       final path = await _exportService.exportToCsv(_history);
-
       _isLoading = false;
       _errorMessage = null;
       notifyListeners();
-
       return path;
     } catch (e) {
       _isLoading = false;
@@ -232,7 +214,7 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Share file
+  // Share
   Future<void> shareFile(String filePath, {String? subject}) async {
     try {
       await _exportService.shareFile(filePath, subject: subject);
@@ -242,31 +224,14 @@ class CalculationProvider extends ChangeNotifier {
     }
   }
 
-  // Reset calculator
+  // Reset
   void reset() {
-    _currentInput = CalculationInput(
-      salePrice: 0,
-      salePriceVat: 0,
-      salePriceVatIncluded: false,
-      purchasePrice: 0,
-      purchasePriceVat: 0,
-      purchasePriceVatIncluded: false,
-      shippingCost: 0,
-      shippingVat: 0,
-      shippingVatIncluded: false,
-      commission: 0,
-      commissionVat: 0,
-      commissionVatIncluded: false,
-      otherExpenses: 0,
-      otherExpensesVat: 0,
-      otherExpensesVatIncluded: false,
-    );
+    _currentInput = CalculationInput.empty;
     _currentResult = null;
     _errorMessage = null;
     notifyListeners();
   }
 
-  // Clear error message
   void clearError() {
     _errorMessage = null;
     notifyListeners();

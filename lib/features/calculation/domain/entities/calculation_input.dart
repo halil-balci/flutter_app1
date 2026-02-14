@@ -19,7 +19,7 @@ class CalculationInput {
   final double otherExpensesVat;
   final bool otherExpensesVatIncluded;
 
-  CalculationInput({
+  const CalculationInput({
     required this.salePrice,
     required this.salePriceVat,
     required this.salePriceVatIncluded,
@@ -37,45 +37,23 @@ class CalculationInput {
     required this.otherExpensesVatIncluded,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'salePrice': salePrice,
-      'salePriceVat': salePriceVat,
-      'salePriceVatIncluded': salePriceVatIncluded ? 1 : 0,
-      'purchasePrice': purchasePrice,
-      'purchasePriceVat': purchasePriceVat,
-      'purchasePriceVatIncluded': purchasePriceVatIncluded ? 1 : 0,
-      'shippingCost': shippingCost,
-      'shippingVat': shippingVat,
-      'shippingVatIncluded': shippingVatIncluded ? 1 : 0,
-      'commission': commission,
-      'commissionVat': commissionVat,
-      'commissionVatIncluded': commissionVatIncluded ? 1 : 0,
-      'otherExpenses': otherExpenses,
-      'otherExpensesVat': otherExpensesVat,
-      'otherExpensesVatIncluded': otherExpensesVatIncluded ? 1 : 0,
-    };
-  }
-
-  factory CalculationInput.fromMap(Map<String, dynamic> map) {
-    return CalculationInput(
-      salePrice: map['salePrice'] ?? 0.0,
-      salePriceVat: map['salePriceVat'] ?? 0.0,
-      salePriceVatIncluded: map['salePriceVatIncluded'] == 1,
-      purchasePrice: map['purchasePrice'] ?? 0.0,
-      purchasePriceVat: map['purchasePriceVat'] ?? 0.0,
-      purchasePriceVatIncluded: map['purchasePriceVatIncluded'] == 1,
-      shippingCost: map['shippingCost'] ?? 0.0,
-      shippingVat: map['shippingVat'] ?? 0.0,
-      shippingVatIncluded: map['shippingVatIncluded'] == 1,
-      commission: map['commission'] ?? 0.0,
-      commissionVat: map['commissionVat'] ?? 0.0,
-      commissionVatIncluded: map['commissionVatIncluded'] == 1,
-      otherExpenses: map['otherExpenses'] ?? 0.0,
-      otherExpensesVat: map['otherExpensesVat'] ?? 0.0,
-      otherExpensesVatIncluded: map['otherExpensesVatIncluded'] == 1,
-    );
-  }
+  static const empty = CalculationInput(
+    salePrice: 0,
+    salePriceVat: 0,
+    salePriceVatIncluded: false,
+    purchasePrice: 0,
+    purchasePriceVat: 0,
+    purchasePriceVatIncluded: false,
+    shippingCost: 0,
+    shippingVat: 0,
+    shippingVatIncluded: false,
+    commission: 0,
+    commissionVat: 0,
+    commissionVatIncluded: false,
+    otherExpenses: 0,
+    otherExpensesVat: 0,
+    otherExpensesVatIncluded: false,
+  );
 
   CalculationInput copyWith({
     double? salePrice,
