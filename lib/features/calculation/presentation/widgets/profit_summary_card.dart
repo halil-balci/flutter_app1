@@ -358,6 +358,7 @@ class ProfitSummaryCard extends StatelessWidget {
                           value: CurrencyFormatter.formatWithSymbol(
                             result.totalRevenue,
                           ),
+                          onTap: () => _showIncomeDetails(context),
                         ),
                         const SizedBox(height: 8),
                         _buildSummaryRow(
@@ -367,6 +368,7 @@ class ProfitSummaryCard extends StatelessWidget {
                           value: CurrencyFormatter.formatWithSymbol(
                             result.totalCosts,
                           ),
+                          onTap: () => _showExpenseDetails(context),
                         ),
                       ],
                     ),
@@ -410,8 +412,9 @@ class ProfitSummaryCard extends StatelessWidget {
     required Color iconColor,
     required String label,
     required String value,
+    VoidCallback? onTap,
   }) {
-    return Row(
+    final row = Row(
       children: [
         Container(
           padding: const EdgeInsets.all(6),
@@ -438,6 +441,223 @@ class ProfitSummaryCard extends StatelessWidget {
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
+          ),
+        ),
+        if (onTap != null) ...[
+          const SizedBox(width: 6),
+          const Icon(
+            Icons.chevron_right_rounded,
+            size: 18,
+            color: AppTheme.textMuted,
+          ),
+        ],
+      ],
+    );
+
+    if (onTap == null) return row;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: row,
+        ),
+      ),
+    );
+  }
+
+  double _calculateBaseAmount(double totalAmount, double vatAmount) {
+    final baseAmount = totalAmount - vatAmount;
+    return baseAmount < 0 ? 0 : baseAmount;
+  }
+
+  void _showIncomeDetails(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    _showDetailsBottomSheet(
+      context: context,
+      title: l10n.totalIncome,
+      icon: Icons.arrow_upward_rounded,
+      iconColor: AppTheme.successColor,
+      items: [
+        (
+          l10n.salePrice,
+          result.breakdown['salePrice'] ?? 0,
+          result.breakdown['salePriceVat'] ?? 0,
+        ),
+      ],
+    );
+  }
+
+  void _showExpenseDetails(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    _showDetailsBottomSheet(
+      context: context,
+      title: l10n.totalExpenses,
+      icon: Icons.arrow_downward_rounded,
+      iconColor: AppTheme.dangerColor,
+      items: [
+        (
+          l10n.purchasePrice,
+          result.breakdown['purchasePrice'] ?? 0,
+          result.breakdown['purchasePriceVat'] ?? 0,
+        ),
+        (
+          l10n.shippingCost,
+          result.breakdown['shippingCost'] ?? 0,
+          result.breakdown['shippingVat'] ?? 0,
+        ),
+        (
+          l10n.commission,
+          result.breakdown['commission'] ?? 0,
+          result.breakdown['commissionVat'] ?? 0,
+        ),
+        (
+          l10n.otherExpenses,
+          result.breakdown['otherExpenses'] ?? 0,
+          result.breakdown['otherExpensesVat'] ?? 0,
+        ),
+      ],
+    );
+  }
+
+  void _showDetailsBottomSheet({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required Color iconColor,
+    required List<(String, double, double)> items,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final isTr = l10n.localeName.toLowerCase().startsWith('tr');
+    final vatExcludedLabel = isTr ? 'KDV Hariç Tutar' : 'Amount Excluding VAT';
+    final vatIncludedLabel = isTr ? 'KDV Dahil Tutar' : 'Amount Including VAT';
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.surfaceColor,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppTheme.dividerColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: iconColor, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final (itemTitle, totalAmount, vatAmount) = items[index];
+                    final baseAmount = _calculateBaseAmount(
+                      totalAmount,
+                      vatAmount,
+                    );
+
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.cardColor,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        boxShadow: AppTheme.cardShadow,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            itemTitle,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(
+                            label: vatExcludedLabel,
+                            value: baseAmount,
+                          ),
+                          const SizedBox(height: 4),
+                          _buildDetailRow(label: l10n.vat, value: vatAmount),
+                          const SizedBox(height: 4),
+                          _buildDetailRow(
+                            label: vatIncludedLabel,
+                            value: totalAmount,
+                            isEmphasized: true,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow({
+    required String label,
+    required double value,
+    bool isEmphasized = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isEmphasized ? AppTheme.textPrimary : AppTheme.textSecondary,
+            fontWeight: isEmphasized ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+        Text(
+          CurrencyFormatter.formatWithSymbol(value),
+          style: TextStyle(
+            fontSize: 12,
+            color: isEmphasized ? AppTheme.textPrimary : AppTheme.textSecondary,
+            fontWeight: isEmphasized ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ],

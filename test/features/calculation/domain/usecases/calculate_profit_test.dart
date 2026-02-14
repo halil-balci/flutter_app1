@@ -148,15 +148,15 @@ void main() {
         final result = calculateProfit(input);
 
         // Assert
-        // Komisyon tutarı: 1000 * 0.10 = 100
-        // Komisyon KDV ile: 100 * 1.20 = 120
-        expect(result.breakdown['commission'], 120);
-        // Komisyon KDV: 100 * 0.20 = 20
-        expect(result.breakdown['commissionVat'], 20);
-        // Toplam maliyet: 600 + 120 = 720
-        expect(result.totalCosts, 720);
-        // Net kar: 1200 - 720 = 480
-        expect(result.netProfit, 480);
+        // Komisyon tabanı: KDV dahil satış tutarı 1200 * 0.10 = 120
+        // Komisyon KDV ile: 120 * 1.20 = 144
+        expect(result.breakdown['commission'], 144);
+        // Komisyon KDV: 120 * 0.20 = 24
+        expect(result.breakdown['commissionVat'], 24);
+        // Toplam maliyet: 600 + 144 = 744
+        expect(result.totalCosts, 744);
+        // Net kar: 1200 - 744 = 456
+        expect(result.netProfit, 456);
       });
 
       test('Komisyon 0-100 arası kontrol - %0 geçerli', () {
@@ -316,23 +316,23 @@ void main() {
         // Maliyet hesaplamaları:
         // - Alış: 1000 * 1.20 = 1200
         // - Kargo: 50 * 1.20 = 60
-        // - Komisyon: (2000 * 0.05) * 1.20 = 120
+        // - Komisyon: (2400 * 0.05) * 1.20 = 144
         // - Diğer: 100 * 1.20 = 120
-        // Toplam: 1200 + 60 + 120 + 120 = 1500
-        expect(result.totalCosts, 1500);
+        // Toplam: 1200 + 60 + 144 + 120 = 1524
+        expect(result.totalCosts, 1524);
 
-        // Net kar: 2400 - 1500 = 900
-        expect(result.netProfit, 900);
+        // Net kar: 2400 - 1524 = 876
+        expect(result.netProfit, 876);
 
         // KDV kontrolü
         // Satış KDV: 2000 * 0.20 = 400
         expect(result.salesVat, 400);
 
-        // Gider KDV: 200 + 10 + 20 + 20 = 250
-        expect(result.expensesVat, 250);
+        // Gider KDV: 200 + 10 + 24 + 20 = 254
+        expect(result.expensesVat, 254);
 
-        // Net KDV: 400 - 250 = 150 (ödenecek)
-        expect(result.netVat, 150);
+        // Net KDV: 400 - 254 = 146 (ödenecek)
+        expect(result.netVat, 146);
       });
 
       test('Ondalıklı sayılarla hesaplama', () {
@@ -478,11 +478,11 @@ void main() {
         // Maliyetler:
         // - Alış: 600 (KDV dahil)
         // - Kargo: 50 * 1.20 = 60
-        // - Komisyon: (1000 * 0.05) * 1.20 = 60
+        // - Komisyon: (1200 * 0.05) * 1.20 = 72
         // - Diğer: 120 (KDV dahil)
-        // Toplam: 840
-        expect(result.totalCosts, 840);
-        expect(result.netProfit, closeTo(360, 0.01));
+        // Toplam: 852
+        expect(result.totalCosts, 852);
+        expect(result.netProfit, closeTo(348, 0.01));
       });
     });
 
